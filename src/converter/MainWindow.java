@@ -158,8 +158,8 @@ public class MainWindow extends JFrame {
          */
         try {
             Arrays.stream(UIManager.getInstalledLookAndFeels()).anyMatch(info -> 
-                (boolean) Aux.ifelse("Nimbus".equals(info.getName()),
-                    (Aux.ThrowingSupplier<Boolean>) () -> {
+                (boolean) Auxiliary.ifelse("Nimbus".equals(info.getName()),
+                    (Auxiliary.ThrowingSupplier<Boolean>) () -> {
                         UIManager.setLookAndFeel(info.getClassName()); return true;
                     },
                     () -> false
