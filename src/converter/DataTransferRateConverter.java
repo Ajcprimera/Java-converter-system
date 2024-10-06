@@ -26,7 +26,7 @@ public class DataTransferRateConverter extends MappingConverter {
             BigDecimal.valueOf(1000000000L), BigDecimal.valueOf(8000000000L), BigDecimal.valueOf(1073741824L), BigDecimal.valueOf(8589934592L),
             BigDecimal.valueOf(1000000000000L), BigDecimal.valueOf(8000000000000L), BigDecimal.valueOf(1099511627776L), BigDecimal.valueOf(8796093022208L)
         };
-        strToValueMap = new HashMap<String, BigDecimal>(18, 1);
+        strToValueMap = new HashMap<String, BigDecimal>(unitNames.length + 1, 1);
         
         fillMap();
     }
