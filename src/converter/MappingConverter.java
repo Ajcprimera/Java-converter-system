@@ -1,6 +1,7 @@
 package converter;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Arrays;
@@ -15,6 +16,7 @@ public abstract class MappingConverter implements Converter {
     public HashMap<String, BigDecimal> strToValueMap;
     public String[] unitNames;
     public BigDecimal[] unitValues;
+    public MathContext contexto = new MathContext(8, RoundingMode.HALF_UP);
     
     public String[] getUnitNames() {
         return unitNames;
@@ -23,7 +25,7 @@ public abstract class MappingConverter implements Converter {
     public BigDecimal convert(String from, String to, BigDecimal value) {
         BigDecimal fromValue = strToValueMap.get(from);
         BigDecimal toValue = strToValueMap.get(to);
-        return value.multiply(fromValue).divide(toValue//, 8, RoundingMode.HALF_UP);
+        return value.multiply(fromValue).divide(toValue, contexto//, 8, RoundingMode.HALF_UP);
         );
     }
     

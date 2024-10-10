@@ -21,7 +21,7 @@ public class MainWindow extends JFrame {
         initComponents();
         
         strToConverterMap.put("Tasa de transmisión de datos", DataTransferRateConverter.class);
-        strToConverterMap.put("Energía", DataTransferRateConverter.class);
+        strToConverterMap.put("Energía", EnergyConverter.class);
         
         comboMeasureType.setModel(new DefaultComboBoxModel<String>( strToConverterMap.keySet().toArray(new String[strToConverterMap.size()]) ));
         comboMeasureType.setSelectedIndex(0);
@@ -74,7 +74,7 @@ public class MainWindow extends JFrame {
             }
         };
         fieldTo.getDocument().addDocumentListener(toDocListener);
-        comboTo.addActionListener(e -> {/*conversionMutex = 2; */convert(fieldTo, comboTo, fieldFrom, comboFrom);});
+        comboTo.addActionListener(e -> {/*conversionMutex = 2; */convert(fieldFrom, comboFrom, fieldTo, comboTo);});
     }
 
     /**
