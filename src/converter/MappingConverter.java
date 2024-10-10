@@ -23,7 +23,8 @@ public abstract class MappingConverter implements Converter {
     public BigDecimal convert(String from, String to, BigDecimal value) {
         BigDecimal fromValue = strToValueMap.get(from);
         BigDecimal toValue = strToValueMap.get(to);
-        return value.multiply(fromValue).divide(toValue, RoundingMode.HALF_UP);
+        return value.multiply(fromValue).divide(toValue//, 8, RoundingMode.HALF_UP);
+        );
     }
     
     protected void fillMap() {

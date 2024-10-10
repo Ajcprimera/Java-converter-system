@@ -3,8 +3,10 @@ package converter;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.event.*;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.math.BigDecimal;
 
 /**
  *
@@ -23,6 +25,56 @@ public class MainWindow extends JFrame {
         
         comboMeasureType.setModel(new DefaultComboBoxModel<String>( strToConverterMap.keySet().toArray(new String[strToConverterMap.size()]) ));
         comboMeasureType.setSelectedIndex(0);
+        
+        Runnable convertLeft = () -> convert(fieldFrom, comboFrom, fieldTo, comboTo);
+        fromDocListener = new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) {
+                System.out.println("Insert left");
+                changedUpdate(e);
+            }
+
+            public void removeUpdate(DocumentEvent e) {
+                System.out.println("Remove left");
+                changedUpdate(e);
+            }
+
+            public void changedUpdate(DocumentEvent e) {
+                /*
+                Auxiliary.ifelse(conversionMutex > 0,
+                    () -> {--conversionMutex; return null;},
+                    () -> {conversionMutex = 2; EventQueue.invokeLater(convertLeft); return null;}
+                );
+                */
+                EventQueue.invokeLater(convertLeft);
+            }
+        };
+        fieldFrom.getDocument().addDocumentListener(fromDocListener);
+        comboFrom.addActionListener(e -> {/*conversionMutex = 2; */convert(fieldFrom, comboFrom, fieldTo, comboTo);});
+        
+        Runnable convertRight = () -> convert(fieldTo, comboTo, fieldFrom, comboFrom);
+        toDocListener = new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) {
+                System.out.println("Insert right");
+                changedUpdate(e);
+            }
+
+            public void removeUpdate(DocumentEvent e) {
+                System.out.println("Remove right");
+                changedUpdate(e);
+            }
+
+            public void changedUpdate(DocumentEvent e) {
+                /*
+                Auxiliary.ifelse(conversionMutex > 0,
+                    () -> {--conversionMutex; return null;},
+                    () -> {conversionMutex = 2; EventQueue.invokeLater(convertRight); return null;}
+                );
+                */
+                EventQueue.invokeLater(convertRight);
+            }
+        };
+        fieldTo.getDocument().addDocumentListener(toDocListener);
+        comboTo.addActionListener(e -> {/*conversionMutex = 2; */convert(fieldTo, comboTo, fieldFrom, comboFrom);});
     }
 
     /**
@@ -105,6 +157,7 @@ public class MainWindow extends JFrame {
 
         fieldTo.setColumns(10);
         fieldTo.setFont(new Font("sansserif", 0, 18)); // NOI18N
+        fieldTo.setText("1");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
@@ -143,10 +196,43 @@ public class MainWindow extends JFrame {
             return;
         }
         String[] unitNames = converter.getUnitNames().clone();
+        //comboFrom.setEnabled(false); comboTo.setEnabled(false);
         comboFrom.setModel(new DefaultComboBoxModel<String>(unitNames));
         comboTo.setModel(new DefaultComboBoxModel<String>(unitNames));
+        //comboFrom.setEnabled(true); comboTo.setEnabled(true);
     }//GEN-LAST:event_comboMeasureTypeActionPerformed
 
+    private BigDecimal parseNumber(String input) {
+        input = input.replace(",", "");
+        String[] fraction = input.split("/");
+        try {
+            return Auxiliary.ifelse(fraction.length > 2 || fraction.length == 0, () -> null, () -> 
+                Auxiliary.ifelse(fraction.length == 2,
+                    () -> parseNumber(fraction[0]).divide(parseNumber(fraction[1])),
+                    () -> new BigDecimal(fraction[0])
+                )
+            );
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+    
+    private void convert(JTextField fromText, JComboBox fromUnit, JTextField toText, JComboBox toUnit) {
+        BigDecimal number = parseNumber(fromText.getText());
+        String from = (String) fromUnit.getSelectedItem();
+        String to = (String) toUnit.getSelectedItem();
+        Auxiliary.ifelse(number == null, () -> null, () -> {
+            DocumentListener listener = toText == fieldTo ? toDocListener : fromDocListener;
+            toText.getDocument().removeDocumentListener(listener);
+            Auxiliary.ifelse(from.equals(to),
+                () -> {toText.setText(number.toString()); return null;},
+                () -> {toText.setText(String.format("%g", converter.convert(from, to, number))); return null;}
+            );
+            toText.getDocument().addDocumentListener(listener);
+            return null;
+        });
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -176,6 +262,8 @@ public class MainWindow extends JFrame {
 
     private HashMap<String, Class> strToConverterMap = new HashMap<String, Class>(3, 1);
     private Converter converter;
+    private int conversionMutex;
+    private DocumentListener fromDocListener, toDocListener;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JComboBox<String> comboFrom;
     private JComboBox<String> comboMeasureType;
