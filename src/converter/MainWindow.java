@@ -7,6 +7,7 @@ import javax.swing.event.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.math.BigDecimal;
+import java.util.Locale;
 
 /**
  *
@@ -94,6 +95,7 @@ public class MainWindow extends JFrame {
         labelEqual = new JLabel();
         fieldTo = new JTextField();
         comboTo = new JComboBox<>();
+        labelFormula = new JLabel();
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setTitle("Conversor de unidades");
@@ -183,6 +185,18 @@ public class MainWindow extends JFrame {
         gridBagConstraints.insets = new Insets(2, 0, 0, 0);
         panelMain.add(comboTo, gridBagConstraints);
 
+        labelFormula.setFont(new Font("sansserif", 0, 14)); // NOI18N
+        labelFormula.setText("Fórmula: multiplica el valor por 1");
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 2.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new Insets(10, 0, 0, 0);
+        panelMain.add(labelFormula, gridBagConstraints);
+
         getContentPane().add(panelMain, BorderLayout.CENTER);
 
         pack();
@@ -203,7 +217,7 @@ public class MainWindow extends JFrame {
     }//GEN-LAST:event_comboMeasureTypeActionPerformed
 
     private BigDecimal parseNumber(String input) {
-        input = input.replace(",", "");
+        input = input.replace(',', '.');
         String[] fraction = input.split("/");
         try {
             return Auxiliary.ifelse(fraction.length > 2 || fraction.length == 0, () -> null, () -> 
@@ -226,9 +240,10 @@ public class MainWindow extends JFrame {
             toText.getDocument().removeDocumentListener(listener);
             Auxiliary.ifelse(from.equals(to),
                 () -> {toText.setText(number.toString()); return null;},
-                () -> {toText.setText(String.format("%g", converter.convert(from, to, number))); return null;}
+                () -> {toText.setText(String.format(Locale.US, "%g", converter.convert(from, to, number))); return null;}
             );
             toText.getDocument().addDocumentListener(listener);
+            labelFormula.setText(converter.getFormula(from, to));
             return null;
         });
     }
@@ -271,6 +286,7 @@ public class MainWindow extends JFrame {
     private JTextField fieldFrom;
     private JTextField fieldTo;
     private JLabel labelEqual;
+    private JLabel labelFormula;
     private JPanel panelMain;
     // End of variables declaration//GEN-END:variables
 }

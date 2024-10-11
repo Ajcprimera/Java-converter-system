@@ -6,6 +6,7 @@ import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Arrays;
 import java.util.function.Consumer;
+import java.util.Locale;
 
 /**
  *
@@ -20,6 +21,10 @@ public abstract class MappingConverter implements Converter {
     
     public String[] getUnitNames() {
         return unitNames;
+    }
+
+    public String getFormula(String from, String to) {
+        return String.format(Locale.US, "Fórmula: multiplica el valor por %g", convert(from, to, BigDecimal.ONE));
     }
 
     public BigDecimal convert(String from, String to, BigDecimal value) {

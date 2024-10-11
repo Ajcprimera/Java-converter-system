@@ -10,4 +10,6 @@ public interface Converter {
     BigDecimal convert(String from, String to, BigDecimal value);
     
     String[] getUnitNames();
+
+    String getFormula(String from, String to);
 }
